@@ -1,6 +1,14 @@
 [workspace]
 resolver = "2"
-members = ["tfhe", "tasks", "apps/trivium", "concrete-csprng"]
+members = [
+    "tfhe",
+    "tasks",
+    "apps/trivium",
+    "concrete-csprng",
+    "concrete-cpu-noise-model",
+    "tfhe-rs-cost-model",
+    "concrete-security-curves-rust",
+]
 
 [profile.bench]
 lto = "fat"
