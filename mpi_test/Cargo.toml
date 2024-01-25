@@ -1,0 +1,22 @@
+[package]
+name = "mpi_test"
+version = "0.4.0"
+edition = "2021"
+license = "BSD-3-Clause-Clear"
+description = "Cryptographically Secure PRNG used in the TFHE-rs library."
+homepage = "https://zama.ai/"
+documentation = "https://docs.zama.ai/tfhe-rs"
+repository = "https://github.com/zama-ai/tfhe-rs"
+readme = "README.md"
+keywords = ["fully", "homomorphic", "encryption", "fhe", "cryptography"]
+rust-version = "1.72"
+
+[dependencies]
+mpi = "0.7"
+tfhe = { path = "../tfhe", features = [
+    "shortint",
+    "x86_64",
+    "internal-keycache",
+] }
+rayon = "1.8"
+bincode = "1.3"
