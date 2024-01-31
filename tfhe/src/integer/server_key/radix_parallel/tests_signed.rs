@@ -4,6 +4,8 @@ use crate::integer::{
     BooleanBlock, IntegerKeyKind, RadixClientKey, ServerKey, SignedRadixCiphertext,
 };
 use crate::shortint::ciphertext::NoiseLevel;
+#[cfg(feature = "__coverage")]
+use crate::shortint::parameters::coverage_parameters::*;
 use crate::shortint::parameters::*;
 use itertools::{iproduct, izip};
 use paste::paste;
@@ -11,35 +13,74 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 
 /// Number of loop iteration within randomized tests
+#[cfg(not(feature = "__coverage"))]
 const NB_TESTS: usize = 30;
-
+/// Smaller number of loop iteration within randomized test,
+/// meant for test where the function tested is more expensive
+#[cfg(not(feature = "__coverage"))]
 const NB_TESTS_SMALLER: usize = 10;
+#[cfg(not(feature = "__coverage"))]
+const NB_TESTS_UNCHECKED: usize = NB_TESTS;
+
+// Use lower numbers for coverage to ensure fast tests to counter balance slowdown due to code
+// instrumentation
+#[cfg(feature = "__coverage")]
+const NB_TESTS: usize = 1;
+#[cfg(feature = "__coverage")]
+const NB_TESTS_SMALLER: usize = 1;
+/// Unchecked test cases needs a minimum number of tests of 4 in order to provide guarantees.
+#[cfg(feature = "__coverage")]
+const NB_TESTS_UNCHECKED: usize = 4;
+
+#[cfg(not(feature = "__coverage"))]
 const NB_CTXT: usize = 4;
+#[cfg(feature = "__coverage")]
+const NB_CTXT: usize = 2;
 
 macro_rules! create_parametrized_test{
-    ($name:ident { $($param:ident),* }) => {
+    (
+        $name:ident {
+            $($(#[$cfg:meta])* $param:ident),*
+            $(,)?
+        }
+    ) => {
         paste! {
             $(
-            #[test]
-            fn [<test_ $name _ $param:lower>]() {
-                $name($param)
-            }
+                #[test]
+                $(#[$cfg])*
+                fn [<test_ $name _ $param:lower>]() {
+                    $name($param)
+                }
             )*
         }
     };
      ($name:ident)=> {
         create_parametrized_test!($name
         {
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MESSAGE_1_CARRY_1_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MULTI_BIT_MESSAGE_1_CARRY_1_GROUP_2_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MULTI_BIT_MESSAGE_1_CARRY_1_GROUP_3_KS_PBS,
+            #[cfg(not(feature = "__coverage"))]
             PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-            PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+            #[cfg(not(feature = "__coverage"))]
+            PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+            #[cfg(feature = "__coverage")]
+            COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+            #[cfg(feature = "__coverage")]
+            COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
         });
     };
 }
@@ -415,13 +456,24 @@ create_parametrized_test!(integer_signed_unchecked_overflowing_add);
 create_parametrized_test!(integer_signed_unchecked_overflowing_add_parallelized {
     // Requires 4 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_unchecked_neg);
 create_parametrized_test!(integer_signed_unchecked_sub);
@@ -429,13 +481,24 @@ create_parametrized_test!(integer_signed_unchecked_overflowing_sub);
 create_parametrized_test!(integer_signed_unchecked_overflowing_sub_parallelized {
     // Requires 4 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_unchecked_mul);
 create_parametrized_test!(integer_signed_unchecked_bitand);
@@ -444,70 +507,136 @@ create_parametrized_test!(integer_signed_unchecked_bitxor);
 create_parametrized_test!(integer_signed_unchecked_left_shift {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 
 create_parametrized_test!(integer_signed_unchecked_right_shift {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 
 create_parametrized_test!(integer_signed_unchecked_rotate_right {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 
 create_parametrized_test!(integer_signed_unchecked_rotate_left {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 
 create_parametrized_test!(integer_signed_unchecked_div_rem {
     // Does not support 1_1
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_unchecked_div_rem_floor {
     // Does not support 1_1
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_unchecked_absolute_value);
 
@@ -535,7 +664,8 @@ fn integer_signed_unchecked_add(param: impl Into<PBSParameters>) {
         assert_eq!(clear_res, expected_clear);
     }
 
-    for (clear_0, clear_1) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus)
+    for (clear_0, clear_1) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
     {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
         let ctxt_1 = cks.encrypt_signed_radix(clear_1, NB_CTXT);
@@ -719,7 +849,9 @@ fn integer_signed_unchecked_neg(param: impl Into<PBSParameters>) {
         assert_eq!(clear_result, -modulus);
     }
 
-    for (clear_0, _) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus) {
+    for (clear_0, _) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
+    {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
 
         let ct_res = sks.unchecked_neg(&ctxt_0);
@@ -761,7 +893,8 @@ fn integer_signed_unchecked_sub(param: impl Into<PBSParameters>) {
         assert_eq!(clear_res, expected_clear);
     }
 
-    for (clear_0, clear_1) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus)
+    for (clear_0, clear_1) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
     {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
         let ctxt_1 = cks.encrypt_signed_radix(clear_1, NB_CTXT);
@@ -913,7 +1046,8 @@ fn integer_signed_unchecked_mul(param: impl Into<PBSParameters>) {
 
     let modulus = (cks.parameters().message_modulus().0.pow(NB_CTXT as u32) / 2) as i64;
 
-    for (clear_0, clear_1) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus)
+    for (clear_0, clear_1) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
     {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
         let ctxt_1 = cks.encrypt_signed_radix(clear_1, NB_CTXT);
@@ -932,7 +1066,8 @@ fn integer_signed_unchecked_bitand(param: impl Into<PBSParameters>) {
 
     let modulus = (cks.parameters().message_modulus().0.pow(NB_CTXT as u32) / 2) as i64;
 
-    for (clear_0, clear_1) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus)
+    for (clear_0, clear_1) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
     {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
         let ctxt_1 = cks.encrypt_signed_radix(clear_1, NB_CTXT);
@@ -951,7 +1086,8 @@ fn integer_signed_unchecked_bitor(param: impl Into<PBSParameters>) {
 
     let modulus = (cks.parameters().message_modulus().0.pow(NB_CTXT as u32) / 2) as i64;
 
-    for (clear_0, clear_1) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus)
+    for (clear_0, clear_1) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
     {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
         let ctxt_1 = cks.encrypt_signed_radix(clear_1, NB_CTXT);
@@ -970,7 +1106,8 @@ fn integer_signed_unchecked_bitxor(param: impl Into<PBSParameters>) {
 
     let modulus = (cks.parameters().message_modulus().0.pow(NB_CTXT as u32) / 2) as i64;
 
-    for (clear_0, clear_1) in create_iterator_of_signed_random_pairs::<NB_TESTS>(&mut rng, modulus)
+    for (clear_0, clear_1) in
+        create_iterator_of_signed_random_pairs::<NB_TESTS_UNCHECKED>(&mut rng, modulus)
     {
         let ctxt_0 = cks.encrypt_signed_radix(clear_0, NB_CTXT);
         let ctxt_1 = cks.encrypt_signed_radix(clear_1, NB_CTXT);
@@ -1492,46 +1629,90 @@ create_parametrized_test!(integer_signed_default_absolute_value);
 create_parametrized_test!(integer_signed_default_left_shift {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_default_right_shift {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_default_rotate_left {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 create_parametrized_test!(integer_signed_default_rotate_right {
     // Requires 3 bits, so 1_1 parameters are not supported
     // until they get their own version of the algorithm
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_3_CARRY_3_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_4_CARRY_4_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_2_KS_PBS,
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_3_KS_PBS,
-    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS
+    #[cfg(not(feature = "__coverage"))]
+    PARAM_MULTI_BIT_MESSAGE_3_CARRY_3_GROUP_3_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MESSAGE_2_CARRY_2_KS_PBS,
+    #[cfg(feature = "__coverage")]
+    COVERAGE_PARAM_MULTI_BIT_MESSAGE_2_CARRY_2_GROUP_2_KS_PBS
 });
 
 fn integer_signed_default_add<P>(param: P)

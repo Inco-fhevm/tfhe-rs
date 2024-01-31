@@ -7,12 +7,14 @@ use crate::shortint::ClassicPBSParameters;
 use crate::integer::keycache::KEY_CACHE;
 
 create_parametrized_test!(big_radix_encrypt_decrypt_128_bits {
+    #[cfg(not(feature = "__coverage"))]
     PARAM_MESSAGE_1_CARRY_1_KS_PBS,
     PARAM_MESSAGE_2_CARRY_2_KS_PBS /* PARAM_MESSAGE_3_CARRY_3_KS_PBS, Skipped as the key requires
                                     * 32GB
                                     * PARAM_MESSAGE_4_CARRY_4_KS_PBS, Skipped as the key requires
                                     * 550GB */
 });
+#[cfg(not(feature = "__coverage"))]
 create_parametrized_test!(radix_encrypt_decrypt_compressed_128_bits {
     PARAM_MESSAGE_1_CARRY_1_KS_PBS,
     PARAM_MESSAGE_2_CARRY_2_KS_PBS /* PARAM_MESSAGE_3_CARRY_3_KS_PBS, Skipped as its slow
@@ -49,6 +51,7 @@ fn big_radix_encrypt_decrypt_128_bits(param: ClassicPBSParameters) {
     assert_eq!(clear, dec);
 }
 
+#[cfg(not(feature = "__coverage"))]
 fn radix_encrypt_decrypt_compressed_128_bits(param: ClassicPBSParameters) {
     let (cks, _) = KEY_CACHE.get_from_params(param, IntegerKeyKind::Radix);
     let public_key = CompressedPublicKey::new(&cks);

@@ -345,7 +345,7 @@ test_core_crypto_cov: install_rs_build_toolchain install_rs_check_toolchain inst
 			--out xml --output-dir coverage/core_crypto_avx512 --line --engine llvm --timeout 500 \
 			--implicit-test-threads $(COVERAGE_EXCLUDED_FILES) \
 			--features=$(TARGET_ARCH_FEATURE),experimental,internal-keycache,__coverage,$(AVX512_FEATURE) \
-			-p $(TFHE_SPEC) -- core_crypto::; \
+			-p $(TFHE_SPEC) -- -Z unstable-options --report-time core_crypto::; \
 	fi
 
 .PHONY: test_gpu # Run the tests of the core_crypto module including experimental on the gpu backend
@@ -376,7 +376,7 @@ test_boolean_cov: install_rs_check_toolchain install_tarpaulin
 		--out xml --output-dir coverage/boolean --line --engine llvm --timeout 500 \
 		$(COVERAGE_EXCLUDED_FILES) \
 		--features=$(TARGET_ARCH_FEATURE),boolean,internal-keycache,__coverage \
-		-p $(TFHE_SPEC) -- boolean::
+		-p $(TFHE_SPEC) -- -Z unstable-options --report-time boolean::
 
 .PHONY: test_c_api_rs # Run the rust tests for the C API
 test_c_api_rs: install_rs_check_toolchain
@@ -417,7 +417,7 @@ test_shortint_cov: install_rs_check_toolchain install_tarpaulin
 		--out xml --output-dir coverage/shortint --line --engine llvm --timeout 500 \
 		$(COVERAGE_EXCLUDED_FILES) \
 		--features=$(TARGET_ARCH_FEATURE),shortint,internal-keycache,__coverage \
-		-p $(TFHE_SPEC) -- shortint::
+		-p $(TFHE_SPEC) -- -Z unstable-options --report-time shortint::
 
 .PHONY: test_integer_ci # Run the tests for integer ci
 test_integer_ci: install_rs_check_toolchain install_cargo_nextest
@@ -474,6 +474,15 @@ test_safe_deserialization: install_rs_build_toolchain install_cargo_nextest
 test_integer: install_rs_build_toolchain
 	RUSTFLAGS="$(RUSTFLAGS)" cargo $(CARGO_RS_BUILD_TOOLCHAIN) test --profile $(CARGO_PROFILE) \
 		--features=$(TARGET_ARCH_FEATURE),integer,internal-keycache -p $(TFHE_SPEC) -- integer::
+
+.PHONY: test_integer_cov # Run the tests of the integer module with code coverage
+test_integer_cov: install_rs_check_toolchain install_tarpaulin
+	RUSTFLAGS="$(RUSTFLAGS)" cargo $(CARGO_RS_CHECK_TOOLCHAIN) tarpaulin --profile $(CARGO_PROFILE) \
+		--out xml --output-dir coverage/integer --line --engine llvm --timeout 500 \
+		--implicit-test-threads \
+		--exclude-files $(COVERAGE_EXCLUDED_FILES) \
+		--features=$(TARGET_ARCH_FEATURE),integer,internal-keycache,__coverage \
+		-p $(TFHE_SPEC) -- -Z unstable-options --report-time integer::
 
 .PHONY: test_high_level_api # Run all the tests for high_level_api
 test_high_level_api: install_rs_build_toolchain
