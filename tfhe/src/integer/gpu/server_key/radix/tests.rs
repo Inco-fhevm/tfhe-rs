@@ -1,7 +1,8 @@
 use crate::core_crypto::gpu::{CudaDevice, CudaStream};
 use crate::integer::gpu::ciphertext::CudaRadixCiphertext;
 use crate::integer::gpu::{gen_keys_gpu, CudaServerKey};
-use crate::integer::{RadixCiphertext, RadixClientKey, ServerKey};
+use crate::integer::keycache::KEY_CACHE;
+use crate::integer::{IntegerKeyKind, RadixCiphertext, RadixClientKey, ServerKey};
 use crate::shortint::parameters::*;
 use rand::Rng;
 use std::cmp::{max, min};
@@ -53,6 +54,8 @@ create_gpu_parametrized_test!(integer_unchecked_gt);
 create_gpu_parametrized_test!(integer_unchecked_ge);
 create_gpu_parametrized_test!(integer_unchecked_lt);
 create_gpu_parametrized_test!(integer_unchecked_le);
+create_gpu_parametrized_test!(integer_unchecked_scalar_eq);
+create_gpu_parametrized_test!(integer_unchecked_scalar_ne);
 create_gpu_parametrized_test!(integer_unchecked_scalar_gt);
 create_gpu_parametrized_test!(integer_unchecked_scalar_ge);
 create_gpu_parametrized_test!(integer_unchecked_scalar_lt);
@@ -90,6 +93,8 @@ create_gpu_parametrized_test!(integer_gt);
 create_gpu_parametrized_test!(integer_ge);
 create_gpu_parametrized_test!(integer_lt);
 create_gpu_parametrized_test!(integer_le);
+create_gpu_parametrized_test!(integer_scalar_eq);
+create_gpu_parametrized_test!(integer_scalar_ne);
 create_gpu_parametrized_test!(integer_scalar_gt);
 create_gpu_parametrized_test!(integer_scalar_ge);
 create_gpu_parametrized_test!(integer_scalar_lt);
@@ -727,7 +732,6 @@ where
         let d_ctxt_1 = CudaRadixCiphertext::from_radix_ciphertext(&ctxt_1, &stream);
         let d_ctxt_2 = CudaRadixCiphertext::from_radix_ciphertext(&ctxt_2, &stream);
 
-        // let h_ct_res = h_sks.unchecked_eq(&ctxt_1, &ctxt_2);
         let d_ct_res = sks.unchecked_ne(&d_ctxt_1, &d_ctxt_2, &stream);
 
         let ct_res = d_ct_res.to_radix_ciphertext(&stream);
@@ -913,6 +917,100 @@ where
 
         // Check the correctness
         assert_eq!(expected, dec_res);
+    }
+}
+
+fn integer_unchecked_scalar_eq<P>(param: P)
+where
+    P: Into<PBSParameters> + Copy,
+{
+    let gpu_index = 0;
+    let device = CudaDevice::new(gpu_index);
+    let stream = CudaStream::new_unchecked(device);
+
+    // let (_, h_sks) = KEY_CACHE.get_from_params(param, IntegerKeyKind::Radix);
+    let (cks, sks) = gen_keys_gpu(param, &stream);
+
+    //RNG
+    let mut rng = rand::thread_rng();
+
+    // message_modulus^vec_length
+    let modulus = cks.parameters().message_modulus().0.pow(NB_CTXT as u32) as u64;
+
+    for _ in 0..NB_TEST {
+        // Define the cleartexts
+        let clear1 = rng.gen::<u64>() % modulus;
+        let clear2 = rng.gen::<u64>() % modulus;
+
+        // Encrypt the integers;;
+        let ctxt_1 = cks.encrypt_radix(clear1, NB_CTXT);
+
+        // Copy to the GPU
+        let d_ctxt_1 = CudaRadixCiphertext::from_radix_ciphertext(&ctxt_1, &stream);
+
+        let d_ct_res = sks.unchecked_scalar_eq(&d_ctxt_1, clear2, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+        let expected: u64 = (clear1 == clear2) as u64;
+
+        // Check the correctness
+        assert_eq!(expected, dec_res);
+
+        let d_ct_res = sks.unchecked_scalar_eq(&d_ctxt_1, clear1, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+
+        // Check the correctness
+        assert_eq!(1, dec_res);
+    }
+}
+
+fn integer_unchecked_scalar_ne<P>(param: P)
+where
+    P: Into<PBSParameters> + Copy,
+{
+    let gpu_index = 0;
+    let device = CudaDevice::new(gpu_index);
+    let stream = CudaStream::new_unchecked(device);
+
+    // let (_, h_sks) = KEY_CACHE.get_from_params(param, IntegerKeyKind::Radix);
+    let (cks, sks) = gen_keys_gpu(param, &stream);
+
+    //RNG
+    let mut rng = rand::thread_rng();
+
+    // message_modulus^vec_length
+    let modulus = cks.parameters().message_modulus().0.pow(NB_CTXT as u32) as u64;
+
+    for _ in 0..NB_TEST {
+        // Define the cleartexts
+        let clear1 = rng.gen::<u64>() % modulus;
+        let clear2 = rng.gen::<u64>() % modulus;
+
+        // Encrypt the integers;;
+        let ctxt_1 = cks.encrypt_radix(clear1, NB_CTXT);
+
+        // Copy to the GPU
+        let d_ctxt_1 = CudaRadixCiphertext::from_radix_ciphertext(&ctxt_1, &stream);
+
+        let d_ct_res = sks.unchecked_scalar_ne(&d_ctxt_1, clear2, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+        let expected: u64 = (clear1 != clear2) as u64;
+
+        // Check the correctness
+        assert_eq!(expected, dec_res);
+
+        let d_ct_res = sks.unchecked_scalar_ne(&d_ctxt_1, clear1, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+
+        // Check the correctness
+        assert_eq!(0, dec_res);
     }
 }
 
@@ -1822,6 +1920,100 @@ where
 
         // Check the correctness
         assert_eq!(expected, dec_res);
+    }
+}
+
+fn integer_scalar_eq<P>(param: P)
+where
+    P: Into<PBSParameters> + Copy,
+{
+    let gpu_index = 0;
+    let device = CudaDevice::new(gpu_index);
+    let stream = CudaStream::new_unchecked(device);
+
+    let (_, h_sks) = KEY_CACHE.get_from_params(param, IntegerKeyKind::Radix);
+    let (cks, sks) = gen_keys_gpu(param, &stream);
+
+    //RNG
+    let mut rng = rand::thread_rng();
+
+    // message_modulus^vec_length
+    let modulus = cks.parameters().message_modulus().0.pow(NB_CTXT as u32) as u64;
+
+    for _ in 0..NB_TEST {
+        // Define the cleartexts
+        let clear1 = rng.gen::<u64>() % modulus;
+        let clear2 = rng.gen::<u64>() % modulus;
+
+        // Encrypt the integers;;
+        let ctxt_1 = cks.encrypt_radix(clear1, NB_CTXT);
+
+        // Copy to the GPU
+        let d_ctxt_1 = CudaRadixCiphertext::from_radix_ciphertext(&ctxt_1, &stream);
+
+        let d_ct_res = sks.scalar_eq(&d_ctxt_1, clear2, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+        let expected: u64 = (clear1 == clear2) as u64;
+
+        // Check the correctness
+        assert_eq!(expected, dec_res);
+
+        let d_ct_res = sks.scalar_eq(&d_ctxt_1, clear1, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+
+        // Check the correctness
+        assert_eq!(1, dec_res);
+    }
+}
+
+fn integer_scalar_ne<P>(param: P)
+where
+    P: Into<PBSParameters> + Copy,
+{
+    let gpu_index = 0;
+    let device = CudaDevice::new(gpu_index);
+    let stream = CudaStream::new_unchecked(device);
+
+    // let (_, h_sks) = KEY_CACHE.get_from_params(param, IntegerKeyKind::Radix);
+    let (cks, sks) = gen_keys_gpu(param, &stream);
+
+    //RNG
+    let mut rng = rand::thread_rng();
+
+    // message_modulus^vec_length
+    let modulus = cks.parameters().message_modulus().0.pow(NB_CTXT as u32) as u64;
+
+    for _ in 0..NB_TEST {
+        // Define the cleartexts
+        let clear1 = rng.gen::<u64>() % modulus;
+        let clear2 = rng.gen::<u64>() % modulus;
+
+        // Encrypt the integers;;
+        let ctxt_1 = cks.encrypt_radix(clear1, NB_CTXT);
+
+        // Copy to the GPU
+        let d_ctxt_1 = CudaRadixCiphertext::from_radix_ciphertext(&ctxt_1, &stream);
+
+        let d_ct_res = sks.scalar_ne(&d_ctxt_1, clear2, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+        let expected: u64 = (clear1 != clear2) as u64;
+
+        // Check the correctness
+        assert_eq!(expected, dec_res);
+
+        let d_ct_res = sks.scalar_ne(&d_ctxt_1, clear1, &stream);
+
+        let ct_res = d_ct_res.to_radix_ciphertext(&stream);
+        let dec_res: u64 = cks.decrypt_radix(&ct_res);
+
+        // Check the correctness
+        assert_eq!(0, dec_res);
     }
 }
 
