@@ -42,7 +42,27 @@ use crate::shortint::parameters::{
 };
 use crate::shortint::PBSOrder;
 use serde::{Deserialize, Serialize};
+use std::cell::RefCell;
 use std::fmt::{Debug, Display, Formatter};
+
+thread_local! {
+    pub static PBS_COUNT: RefCell<usize> = const { RefCell::new(0usize) };
+}
+
+pub fn get_pbs_count() -> usize {
+    let main_thread_count = PBS_COUNT.with_borrow(|count| *count);
+
+    let rayon_thread_counts: usize = rayon::broadcast(|_| PBS_COUNT.with_borrow(|count| *count))
+        .into_iter()
+        .sum();
+
+    main_thread_count + rayon_thread_counts
+}
+
+pub fn reset_pbs_count() {
+    PBS_COUNT.with_borrow_mut(|count| *count = 0);
+    rayon::broadcast(|_| PBS_COUNT.with_borrow_mut(|count| *count = 0));
+}
 
 /// Error returned when the carry buffer is full.
 #[derive(Debug)]
@@ -943,6 +963,8 @@ impl ServerKey {
         ct: &mut Ciphertext,
         acc: &LookupTableOwned,
     ) {
+        PBS_COUNT.with_borrow_mut(|v| *v += 1);
+
         if ct.is_trivial() {
             self.trivial_pbs_assign(ct, acc);
             return;
@@ -1019,6 +1041,8 @@ impl ServerKey {
         ct: &mut Ciphertext,
         acc: &LookupTableOwned,
     ) {
+        PBS_COUNT.with_borrow_mut(|v| *v += 1);
+
         if ct.is_trivial() {
             self.trivial_pbs_assign(ct, acc);
             return;
