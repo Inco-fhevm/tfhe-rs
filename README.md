@@ -4,14 +4,14 @@
 </p>
 <hr/>
 <p align="center">
-  <a href="https://docs.zama.ai/tfhe-rs"> 📒 Read documentation</a> | <a href="https://zama.ai/community"> 💛 Community support</a> | <a href="https://github.com/zama-ai/awesome-zama"> 📚 FHE resources</a>
+  <a href="https://docs.zama.ai/tfhe-rs"> 📒 Documentation</a> | <a href="https://zama.ai/community"> 💛 Community support</a> | <a href="https://github.com/zama-ai/awesome-zama"> 📚 FHE resources</a>
 </p>
 <p align="center">
 <!-- Version badge using shields.io -->
   <a href="https://github.com/zama-ai/tfhe-rs/releases">
     <img src="https://img.shields.io/github/v/release/zama-ai/tfhe-rs?style=flat-square">
   </a>
-  <!-- Link to tutorials badge using shields.io -->
+  <!-- License badge -->
   <a href="#license">
     <img src="https://img.shields.io/badge/License-BSD--3--Clause--Clear-orange?style=flat-square">
   </a>
@@ -46,29 +46,29 @@
 
 ### 🟨 What is TFHE-rs
 
-TFHE-rs is a pure Rust implementation of TFHE for boolean and integer arithmetics over encrypted data. It includes:
- - a **Rust** API
- - a **C** API
- - and a **client-side WASM** API
+**TFHE-rs** is a pure Rust implementation of TFHE for boolean and integer arithmetics over encrypted data.
 
-TFHE-rs is meant for developers and researchers who want full control over
+It includes:
+- a **Rust** API
+- a **C** API
+- and a **client-side WASM** API
+
+TFHE-rs is desgined for developers and researchers who want full control over
 what they can do with TFHE, while not having to worry about the low level
 implementation. The goal is to have a stable, simple, high-performance, and
 production-ready library for all the advanced features of TFHE.
 <br></br>
 
 ### 🟨 Main features
-TFHE-rs comes packed with powerful features, such as:
 
-- A low-level, cryptographic library that implements Zama’s variant of TFHE, including programmable bootstrapping;
-- An implementation of the original TFHE boolean API, which can be used as a drop-in replacement for other TFHE libraries;
-- A short integer API, which enables exact, unbounded FHE integer arithmetics with up to 8 bits of message space;
-- A public key encryption implementation for TFHE;
-- Ciphertext and server key compression for efficient data transfer;
-- A full Rust API, C bindings to the Rust High Level API, and a client-side Javascript API using WASM.
+- **A low-level, cryptographic library**  that implements Zama’s variant of TFHE, including programmable bootstrapping;
+- **An implementation of the original TFHE boolean API**, which can be used as a drop-in replacement for other TFHE libraries;
+- **A short integer API**, which enables exact, unbounded FHE integer arithmetics with up to 8 bits of message space;
+- **A public key encryption implementation** for TFHE;
+- **Ciphertext and server key compression** for efficient data transfer;
+- **A full Rust API, C bindings to the Rust High-Level API, and a client-side Javascript API using WASM**.
 
 *Learn more features in TFHE-rs's [documentation](https://docs.zama.ai/tfhe-rs/readme).*
-<br></br>
 
 <p align="right">
   <a href="#table-of-contents" > ↑ Back to top </a> 
