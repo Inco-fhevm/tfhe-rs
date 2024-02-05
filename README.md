@@ -20,24 +20,65 @@
     <img src="https://img.shields.io/badge/Contribute-Zama%20Bounty%20Program-yellow?style=flat-square">
   </a>
 </p>
-<hr/>
 
 
-**TFHE-rs** is a pure Rust implementation of TFHE for boolean and integer
-arithmetics over encrypted data. It includes:
+
+## Table of Contents
+- **[About](#about)**
+  - [What is TFHE-rs](#-what-is-tfhe-rs)
+  - [Main features](#-main-features)
+- **[Getting Started](#getting-started)**
+   - [Configuration](#-configuration)
+   - [A simple example](#-a-simple-example)
+- **[Resources](#resources)**
+   - [Tutorials](#-tutorials)
+   - [Documentation](#-documentation)
+- **[Working with Concrete ML](working-with-concrete-ml)**
+   - [Disclaimers](#-disclaimers)
+   - [Citations](#-citations)
+   - [Contributing](#-contributing)
+   - [License](#-license)
+- **[Support](#support)**
+<br></br>
+
+
+## About
+
+### 🟨 What is TFHE-rs
+
+TFHE-rs is a pure Rust implementation of TFHE for boolean and integer arithmetics over encrypted data. It includes:
  - a **Rust** API
  - a **C** API
  - and a **client-side WASM** API
 
-**TFHE-rs** is meant for developers and researchers who want full control over
+TFHE-rs is meant for developers and researchers who want full control over
 what they can do with TFHE, while not having to worry about the low level
 implementation. The goal is to have a stable, simple, high-performance, and
 production-ready library for all the advanced features of TFHE.
+<br></br>
+
+### 🟨 Main features
+TFHE-rs comes packed with powerful features, such as:
+
+- A low-level, cryptographic library that implements Zama’s variant of TFHE, including programmable bootstrapping;
+- An implementation of the original TFHE boolean API, which can be used as a drop-in replacement for other TFHE libraries;
+- A short integer API, which enables exact, unbounded FHE integer arithmetics with up to 8 bits of message space;
+- A public key encryption implementation for TFHE;
+- Ciphertext and server key compression for efficient data transfer;
+- A full Rust API, C bindings to the Rust High Level API, and a client-side Javascript API using WASM.
+
+*Learn more features in TFHE-rs's [documentation](https://docs.zama.ai/tfhe-rs/readme).*
+<br></br>
+
+<p align="right">
+  <a href="#table-of-contents" > ↑ Back to top </a> 
+</p>
+
+
 
 ## Getting Started
-The steps to run a first example are described below. 
 
-### Cargo.toml configuration
+### 🟨 Configuration
 To use the latest version of `TFHE-rs` in your project, you first need to add it as a dependency in your `Cargo.toml`:
 
 + For x86_64-based machines running Unix-like OSes:
@@ -58,12 +99,13 @@ tfhe = { version = "*", features = ["boolean", "shortint", "integer", "aarch64-u
 tfhe = { version = "*", features = ["boolean", "shortint", "integer", "x86_64"] }
 ```
 
-Note: You need to use a Rust version >= 1.72 to compile TFHE-rs.
+> Note: You need to use a Rust version >= 1.72 to compile TFHE-rs.
 
-Note: aarch64-based machines are not yet supported for Windows as it's currently missing an entropy source to be able to seed the [CSPRNGs](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) used in TFHE-rs.
+> Note: aarch64-based machines are not yet supported for Windows as it's currently missing an entropy source to be able to seed the [CSPRNGs](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) used in TFHE-rs.
 
+<br></br>
 
-## A simple example
+## 🟨 A simple example
 
 Here is a full example:
 
@@ -120,51 +162,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 To run this code, use the following command: 
 <p align="center"> <code> cargo run --release </code> </p>
 
-Note that when running code that uses `tfhe-rs`, it is highly recommended
+> Note that when running code that uses `tfhe-rs`, it is highly recommended
 to run in release mode with cargo's `--release` flag to have the best performances possible.
 
+*This example is explained in more detail in [this part of the documentation](docs/getting-started/quick_start)*
 
-## Contributing
-
-There are two ways to contribute to TFHE-rs:
-
-- you can open issues to report bugs or typos, or to suggest new ideas
-- you can ask to become an official contributor by emailing [hello@zama.ai](mailto:hello@zama.ai).
-(becoming an approved contributor involves signing our Contributor License Agreement (CLA))
-
-Only approved contributors can send pull requests, so please make sure to get in touch before you do!
-
-## Credits
-
-This library uses several dependencies and we would like to thank the contributors of those
-libraries.
-
-## Need support?
-<a target="_blank" href="https://community.zama.ai">
-  <img src="https://github.com/zama-ai/tfhe-rs/assets/157474013/33d856dc-f25d-454b-a010-af12bff2aa7d">
-</a>
+<p align="right">
+  <a href="#table-of-contents" > ↑ Back to top </a> 
+</p>
 
 
 
-## Citing TFHE-rs
+## Resources 
 
-To cite TFHE-rs in academic papers, please use the following entry:
+### 🟨 Tutorials
+To be udpated
+<br></br>
+### 🟨 Documentation
 
-```text
-@Misc{TFHE-rs,
-  title={{TFHE-rs: A Pure Rust Implementation of the TFHE Scheme for Boolean and Integer Arithmetics Over Encrypted Data}},
-  author={Zama},
-  year={2022},
-  note={\url{https://github.com/zama-ai/tfhe-rs}},
-}
-```
+Full, comprehensive documentation is available here: [https://docs.zama.ai/concrete-ml](https://docs.zama.ai/tfhe-rs).
+<p align="right">
+  <a href="#table-of-contents" > ↑ Back to top </a> 
+</p>
 
-## License
+## Working with TFHE-rs
 
-This software is distributed under the BSD-3-Clause-Clear license. If you have any questions,
-please contact us at `hello@zama.ai`.
-
-## Disclaimers
+### 🟨 Disclaimers
 
 ### Security Estimation
 
@@ -178,3 +201,51 @@ When a new update is published in the Lattice Estimator, we update parameters ac
 
 Mitigation for side channel attacks have not yet been implemented in TFHE-rs,
 and will be released in upcoming versions.
+<br></br>
+
+### 🟨 Citations
+To cite TFHE-rs in academic papers, please use the following entry:
+
+```text
+@Misc{TFHE-rs,
+  title={{TFHE-rs: A Pure Rust Implementation of the TFHE Scheme for Boolean and Integer Arithmetics Over Encrypted Data}},
+  author={Zama},
+  year={2022},
+  note={\url{https://github.com/zama-ai/tfhe-rs}},
+}
+```
+
+### 🟨 Contributing
+
+There are two ways to contribute to TFHE-rs:
+
+- you can open issues to report bugs or typos, or to suggest new ideas
+- you can ask to become an official contributor by emailing [hello@zama.ai](mailto:hello@zama.ai).
+(becoming an approved contributor involves signing our Contributor License Agreement (CLA))
+
+Only approved contributors can send pull requests, so please make sure to get in touch before you do!
+<br></br>
+
+### 🟨 License
+This software is distributed under the **BSD-3-Clause-Clear** license. If you have any questions, please contact us at hello@zama.ai.
+<p align="right">
+  <a href="#table-of-contents" > ↑ Back to top </a> 
+</p>
+
+
+## Support
+
+<a target="_blank" href="https://community.zama.ai">
+  <img src="https://github.com/zama-ai/concrete-ml/assets/157474013/9d518f66-30da-4738-a154-a4d9fce93704">
+</a>
+<br></br>
+
+
+🌟 If you find this project helpful or interesting, please consider giving it a star on GitHub! Your support helps to grow the community and motivates further development. 🚀
+
+[![GitHub stars](https://img.shields.io/github/stars/zama-ai/concrete-ml.svg?style=social&label=Star)](https://github.com/zama-ai/concrete-ml)
+
+Thank you! 
+<p align="right">
+  <a href="#table-of-contents" > ↑ Back to top </a> 
+</p>
