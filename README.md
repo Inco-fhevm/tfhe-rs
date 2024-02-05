@@ -31,6 +31,7 @@
    - [Configuration](#-configuration)
    - [A simple example](#-a-simple-example)
 - **[Resources](#resources)**
+   - [TFHE deep dive](#-tfhe-deep-dive)
    - [Tutorials](#-tutorials)
    - [Documentation](#-documentation)
 - **[Working with Concrete ML](working-with-concrete-ml)**
@@ -99,9 +100,9 @@ tfhe = { version = "*", features = ["boolean", "shortint", "integer", "aarch64-u
 tfhe = { version = "*", features = ["boolean", "shortint", "integer", "x86_64"] }
 ```
 
-> Note: You need to use a Rust version >= 1.72 to compile TFHE-rs.
+> ℹ️ Note: You need to use a Rust version >= 1.72 to compile TFHE-rs.
 
-> Note: aarch64-based machines are not yet supported for Windows as it's currently missing an entropy source to be able to seed the [CSPRNGs](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) used in TFHE-rs.
+> ℹ️ Note: aarch64-based machines are not yet supported for Windows as it's currently missing an entropy source to be able to seed the [CSPRNGs](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) used in TFHE-rs.
 
 <br></br>
 
@@ -162,7 +163,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 To run this code, use the following command: 
 <p align="center"> <code> cargo run --release </code> </p>
 
-> Note that when running code that uses `tfhe-rs`, it is highly recommended
+> ℹ️ Note that when running code that uses `tfhe-rs`, it is highly recommended
 to run in release mode with cargo's `--release` flag to have the best performances possible.
 
 *This example is explained in more detail in [this part of the documentation](docs/getting-started/quick_start)*
@@ -175,8 +176,21 @@ to run in release mode with cargo's `--release` flag to have the best performanc
 
 ## Resources 
 
+### 🟨 TFHE deep dive
+- [TFHE Deep Dive - Part I - Ciphertext types](https://www.zama.ai/post/tfhe-deep-dive-part-1)
+- [TFHE Deep Dive - Part II - Encodings and linear leveled operations](https://www.zama.ai/post/tfhe-deep-dive-part-2)
+- [TFHE Deep Dive - Part III - Key switching and leveled multiplications](https://www.zama.ai/post/tfhe-deep-dive-part-3)
+- [TFHE Deep Dive - Part IV - Programmable Bootstrapping](https://www.zama.ai/post/tfhe-deep-dive-part-4)
+<br></br>
+
 ### 🟨 Tutorials
-To be udpated
+- [Regular Expression Engine with TFHE-rs](https://www.zama.ai/post/regex-engine-tfhe-rs)
+- [Dark Market with TFHE-rs](https://www.zama.ai/post/dark-market-tfhe-rs)
+- [Boolean SHA256 with TFHE-rs](https://www.zama.ai/post/boolean-sha256-tfhe-rs)
+- [Homomorphic Parity Bit](https://docs.zama.ai/tfhe-rs/tutorials/parity_bit)
+- [Homomorphic Case Changing on Ascii String](https://docs.zama.ai/tfhe-rs/tutorials/ascii_fhe_string)
+
+*Explore more useful resources in [TFHE-rs tutorials](https://docs.zama.ai/tfhe-rs/tutorials) and [Awesome Zama repo](https://github.com/zama-ai/awesome-zama)*
 <br></br>
 ### 🟨 Documentation
 
@@ -184,6 +198,7 @@ Full, comprehensive documentation is available here: [https://docs.zama.ai/concr
 <p align="right">
   <a href="#table-of-contents" > ↑ Back to top </a> 
 </p>
+
 
 ## Working with TFHE-rs
 
@@ -219,9 +234,8 @@ To cite TFHE-rs in academic papers, please use the following entry:
 
 There are two ways to contribute to TFHE-rs:
 
-- you can open issues to report bugs or typos, or to suggest new ideas
-- you can ask to become an official contributor by emailing [hello@zama.ai](mailto:hello@zama.ai).
-(becoming an approved contributor involves signing our Contributor License Agreement (CLA))
+- [Open issues](https://github.com/zama-ai/tfhe-rs/issues/new/choose) to report bugs and typos, or to suggest new ideas
+- Request to become an official contributor by emailing [hello@zama.ai](mailto:hello@zama.ai). (becoming an approved contributor involves signing our Contributor License Agreement (CLA))
 
 Only approved contributors can send pull requests, so please make sure to get in touch before you do!
 <br></br>
@@ -243,7 +257,7 @@ This software is distributed under the **BSD-3-Clause-Clear** license. If you ha
 
 🌟 If you find this project helpful or interesting, please consider giving it a star on GitHub! Your support helps to grow the community and motivates further development. 🚀
 
-[![GitHub stars](https://img.shields.io/github/stars/zama-ai/concrete-ml.svg?style=social&label=Star)](https://github.com/zama-ai/concrete-ml)
+[![GitHub stars](https://img.shields.io/github/stars/zama-ai/tfhe-rs.svg?style=social&label=Star)](https://github.com/zama-ai/tfhe-rs)
 
 Thank you! 
 <p align="right">
